@@ -31,6 +31,10 @@ const ICON = {
 };
 const TABS = [['home', 'ホーム'], ['med', '服薬'], ['sleep', '睡眠'], ['skin', '肌'], ['head', '頭痛・天気']];
 const TIMINGS = ['朝', '昼', '夜', '就寝前'];
+// 飲むタイミングの選択肢。1日に複数回のものは、回(スロット)ごとにチェックする。
+const TIMING_OPTS = [['朝', '朝'], ['昼', '昼'], ['夜', '夜'], ['就寝前', '就寝前'], ['朝夜', '朝・夜(1日2回)'], ['毎食後', '毎食後(1日3回)']];
+const TIMING_SLOTS = { 朝夜: ['朝', '夜'], 毎食後: ['朝', '昼', '夜'] };
+const SLOT_LABELS = { 毎食後: { 朝: '朝食後', 昼: '昼食後', 夜: '夕食後' } };
 const SKIN_CHIPS = ['乾燥', '赤み', 'テカリ', 'ニキビ', 'くすみ', '調子いい'];
 const MOODS = ['すっきり', 'ふつう', 'だるい', '頭が重い'];
 const SLEEP_TAGS = ['スマホ', 'カフェイン', 'お酒', '入浴', '運動'];
@@ -86,7 +90,12 @@ function removeMed(id) { delete data.meds[id]; commit() }
 function updatePrefs(mut) { mut(data.prefs); commit() }
 
 function prefs() { const p = data.prefs || {}; return { regions: p.regions || [], thresholds: Object.assign({}, DEF_TH, p.thresholds || {}) } }
-function medList() { return Object.values(data.meds).sort((a, b) => TIMINGS.indexOf(a.timing) - TIMINGS.indexOf(b.timing) || String(a.name).localeCompare(String(b.name), 'ja')) }
+function slotsOf(m) { return TIMING_SLOTS[m.timing] || [m.timing] }
+// 1日1回の薬は記録キーが id のまま(以前の記録と互換)。複数回の薬は「id@朝」のように回ごとに分ける。
+function doseKey(m, slot) { return slotsOf(m).length > 1 ? m.id + '@' + slot : m.id }
+function slotLabel(m, slot) { return (SLOT_LABELS[m.timing] || {})[slot] || slot }
+function medList() { return Object.values(data.meds).sort((a, b) => TIMINGS.indexOf(slotsOf(a)[0]) - TIMINGS.indexOf(slotsOf(b)[0]) || String(a.name).localeCompare(String(b.name), 'ja')) }
+function doses() { const out = []; medList().forEach((m) => slotsOf(m).forEach((slot) => out.push({ m, slot, key: doseKey(m, slot) }))); return out }
 const dayOf = (k) => data.days[k] || {};
 
 /* ---------- derived values ---------- */
@@ -94,10 +103,10 @@ function sleepMin(bed, wake) {
   if (!bed || !wake) return null; const b = bed.split(':').map(Number), w = wake.split(':').map(Number);
   return ((w[0] * 60 + w[1]) - (b[0] * 60 + b[1]) + 1440) % 1440;
 }
-function takenCount(k) { const t = dayOf(k).taken || []; return t.filter((i) => data.meds[i]).length }
-function adherence(k) { const n = Object.keys(data.meds).length; return n ? takenCount(k) / n : null }
+function takenCount(k) { const t = dayOf(k).taken || []; return doses().filter((d) => t.indexOf(d.key) >= 0).length }
+function adherence(k) { const n = doses().length; return n ? takenCount(k) / n : null }
 function streak() {
-  const n = Object.keys(data.meds).length; if (!n) return 0;
+  const n = doses().length; if (!n) return 0;
   const full = (k) => takenCount(k) >= n; let k = todayKey(); if (!full(k)) k = addDays(k, -1); let c = 0;
   while (full(k) && c < 400) { c++; k = addDays(k, -1) } return c;
 }
@@ -232,7 +241,7 @@ function viewHome() {
     }
   }
   h += '</div>';
-  const meds = Object.keys(data.meds).length, tk = takenCount(td), sl = d.sleep, sk = d.skin;
+  const meds = doses().length, tk = takenCount(td), sl = d.sleep, sk = d.skin;
   const slOk = sl && nn(sl.min) ? (sl.min >= 360 && (sl.q || 0) >= 3) : null;
   h += '<div class="tiles">';
   h += '<div class="tile"><button data-act="tab" data-v="med"><span class="lbl">服薬</span><span class="big num">' + tk + '<span class="sub"> / ' + meds + '</span></span>' +
@@ -258,22 +267,25 @@ function viewDataCard() {
 }
 
 function viewMed() {
-  let h = ''; const td = todayKey(), meds = medList(), t = dayOf(td).taken || [];
+  let h = ''; const td = todayKey(), meds = medList(), ds = doses(), t = dayOf(td).taken || [];
   h += '<div class="card stack"><div class="hd"><h2>今日の服薬</h2><span class="sub">連続 <span class="num" style="font-size:16px;color:var(--accent)">' + streak() + '</span> 日</span></div>';
   if (!meds.length) h += '<div class="empty">サプリや薬を登録すると、ここにチェックリストが出ます。</div>';
   TIMINGS.forEach((tm) => {
-    const g = meds.filter((m) => m.timing === tm); if (!g.length) return;
-    h += '<div><div class="lbl" style="margin-bottom:2px">' + tm + '</div>' + g.map((m) => {
-      const on = t.indexOf(m.id) >= 0;
-      return '<div class="med"><button class="check" data-act="toggleMed" data-v="' + esc(m.id) + '" aria-pressed="' + on + '" aria-label="' + esc(m.name) + 'を飲んだ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>' +
-        '<div class="grow"><div><b>' + esc(m.name) + '</b> <span class="tag">' + esc(m.kind) + '</span>' + (on ? ' <span class="tag good">飲んだ</span>' : '') + (m.sample ? ' <span class="tag sample">サンプル</span>' : '') + '</div>' +
+    const g = ds.filter((d) => d.slot === tm); if (!g.length) return;
+    h += '<div><div class="lbl" style="margin-bottom:2px">' + tm + '</div>' + g.map(({ m, slot, key }) => {
+      const on = t.indexOf(key) >= 0, multi = slotsOf(m).length > 1;
+      const doneN = multi ? slotsOf(m).filter((s) => t.indexOf(doseKey(m, s)) >= 0).length : 0;
+      return '<div class="med"><button class="check" data-act="toggleMed" data-v="' + esc(key) + '" aria-pressed="' + on + '" aria-label="' + esc(m.name) + (multi ? '(' + esc(slotLabel(m, slot)) + ')' : '') + 'を飲んだ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>' +
+        '<div class="grow"><div><b>' + esc(m.name) + '</b> <span class="tag">' + esc(m.kind) + '</span>' + (multi ? ' <span class="tag">' + esc(slotLabel(m, slot)) + ' ' + doneN + '/' + slotsOf(m).length + '</span>' : '') + (on ? ' <span class="tag good">飲んだ</span>' : '') + (m.sample ? ' <span class="tag sample">サンプル</span>' : '') + '</div>' +
         '<div class="sub">' + esc(m.dose || '') + (m.effect ? (m.dose ? ' ・ ' : '') + '期待: ' + esc(m.effect) : '') + '</div></div>' +
-        (ui.confirm === 'med:' + m.id ? '<button class="link danger" data-act="delMed" data-v="' + esc(m.id) + '">本当に削除</button>' : '<button class="link" data-act="askDel" data-v="med:' + esc(m.id) + '">削除</button>') + '</div>';
+        // 削除リンクは、その薬の最初の回にだけ出す
+        (slot !== slotsOf(m)[0] ? '' : ui.confirm === 'med:' + m.id ? '<button class="link danger" data-act="delMed" data-v="' + esc(m.id) + '">本当に削除</button>' : '<button class="link" data-act="askDel" data-v="med:' + esc(m.id) + '">削除</button>') + '</div>';
     }).join('') + '</div>';
   });
-  const miss = meds.filter((m) => t.indexOf(m.id) < 0 && m.timing !== '就寝前');
-  if (meds.length && miss.length && new Date().getHours() >= 19) h += '<div class="tip">まだのものが ' + miss.length + ' つあります(' + esc(miss.map((m) => m.name).join('、')) + ')。思い出したときで大丈夫です。</div>';
-  const y = addDays(td, -1), yMiss = meds.filter((m) => (dayOf(y).taken || []).indexOf(m.id) < 0 && !m.sample);
+  const doseName = (d) => d.m.name + (slotsOf(d.m).length > 1 ? '(' + slotLabel(d.m, d.slot) + ')' : '');
+  const miss = ds.filter((d) => t.indexOf(d.key) < 0 && d.slot !== '就寝前');
+  if (ds.length && miss.length && new Date().getHours() >= 19) h += '<div class="tip">まだのものが ' + miss.length + ' つあります(' + esc(miss.map(doseName).join('、')) + ')。思い出したときで大丈夫です。</div>';
+  const y = addDays(td, -1), yMiss = ds.filter((d) => (dayOf(y).taken || []).indexOf(d.key) < 0 && !d.m.sample);
   if (data.days[y] && yMiss.length) h += '<div class="sub">昨日はチェックが ' + yMiss.length + ' つ空いていました。今日もマイペースでいきましょう。</div>';
   h += '</div>';
   h += '<div class="card stack"><h3>今日の体感メモ</h3><div class="field"><textarea id="memo" data-d="memo" placeholder="例: 肌がしっとりした / 少しニキビが増えた">' + esc(ui.draft.memo != null ? ui.draft.memo : (dayOf(td).memo || '')) + '</textarea></div><button class="btn small" data-act="saveMemo">メモを保存</button></div>';
@@ -290,7 +302,7 @@ function viewMed() {
   h += '<div class="card"><details' + (ui.open.addMed ? ' open' : '') + '><summary data-act="toggleOpen" data-v="addMed">サプリ・薬を登録する</summary><div class="stack" style="margin-top:12px">' +
     '<div class="field"><label for="mName">名前</label><input type="text" id="mName" data-d="med.name" value="' + esc(m.name) + '" placeholder="例: ビタミンC"></div>' +
     '<div class="two"><div class="field"><label for="mKind">種類</label><select id="mKind" data-d="med.kind">' + ['サプリ', '薬'].map((x) => '<option' + (m.kind === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></div>' +
-    '<div class="field"><label for="mTiming">飲むタイミング</label><select id="mTiming" data-d="med.timing">' + TIMINGS.map((x) => '<option' + (m.timing === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></div></div>' +
+    '<div class="field"><label for="mTiming">飲むタイミング</label><select id="mTiming" data-d="med.timing">' + TIMING_OPTS.map(([v, l]) => '<option value="' + v + '"' + (m.timing === v ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div></div>' +
     '<div class="field"><label for="mDose">量</label><input type="text" id="mDose" data-d="med.dose" value="' + esc(m.dose) + '" placeholder="例: 1錠"></div>' +
     '<div class="field"><label for="mEffect">期待する効果のメモ</label><input type="text" id="mEffect" data-d="med.effect" value="' + esc(m.effect) + '" placeholder="例: 肌のハリ"></div>' +
     '<button class="btn" data-act="addMed">登録する</button></div></details></div>';
@@ -603,7 +615,7 @@ function saveHeadache() {
 function clearSamples() {
   Object.values(data.meds).forEach((m) => { if (m.sample) delete data.meds[m.id] });
   Object.keys(data.days).forEach((k) => { if (data.days[k].sample) delete data.days[k] });
-  Object.values(data.days).forEach((d) => { if (d.taken) d.taken = d.taken.filter((id) => data.meds[id]) });
+  Object.values(data.days).forEach((d) => { if (d.taken) d.taken = d.taken.filter((key) => data.meds[key.split('@')[0]]) });
   ui.draft = {}; commit(); toast('サンプルを消しました');
 }
 
@@ -629,7 +641,8 @@ function buildPrompt(c, withPhoto) {
   L.push('【今日の情報】');
   L.push('日付: ' + mdw(c.td));
   L.push('肌の自己評価: ' + (c.chips.length ? c.chips.join('、') : '未入力'));
-  L.push('服薬: ' + takenCount(c.td) + '/' + c.meds.length + ' 件チェック済み(' + (c.meds.map((m) => m.name + ((c.d.taken || []).indexOf(m.id) >= 0 ? '○' : '×')).join('、') || '登録なし') + ')');
+  const ds = doses();
+  L.push('服薬: ' + takenCount(c.td) + '/' + ds.length + ' 回チェック済み(' + (ds.map((d) => d.m.name + (slotsOf(d.m).length > 1 ? '・' + slotLabel(d.m, d.slot) : '') + ((c.d.taken || []).indexOf(d.key) >= 0 ? '○' : '×')).join('、') || '登録なし') + ')');
   L.push('昨夜の睡眠: ' + (c.sl && nn(c.sl.min) ? fmtMin(c.sl.min) + '、質 ' + c.sl.q + '/5' + (c.sl.mood ? '、起床時の気分 ' + c.sl.mood : '') + ((c.sl.tags || []).length ? '、寝る前: ' + c.sl.tags.join('・') : '') : '未記録'));
   L.push('今日の体感メモ: ' + (c.d.memo || 'なし'));
   L.push('頭痛: ' + (c.hl && c.hl.had ? 'あり(強さ ' + c.hl.level + '/5)' : 'なし・未記録'));
@@ -772,14 +785,14 @@ async function genAdvice() {
 /* ---------- sample data on first launch ---------- */
 function seedSamples(d) {
   const td = todayKey();
-  [['s1', 'ビタミンC', 'サプリ', '1000mg', '朝', '肌のハリ'], ['s2', 'ヘム鉄', 'サプリ', '1粒', '夜', 'くすみ対策'], ['s3', '頭痛薬(例)', '薬', '1錠', '昼', '頭痛のとき']].forEach((x) => {
+  [['s1', 'ビタミンC', 'サプリ', '1000mg', '朝', '肌のハリ'], ['s2', 'ヘム鉄', 'サプリ', '1粒', '朝夜', 'くすみ対策'], ['s3', '頭痛薬(例)', '薬', '1錠', '昼', '頭痛のとき']].forEach((x) => {
     d.meds[x[0]] = { id: x[0], name: x[1], kind: x[2], dose: x[3], timing: x[4], effect: x[5], sample: true };
   });
   const mins = [430, 380, 350, 455, 410, 330, 445], qs = [4, 3, 2, 4, 3, 2, 4], chipsets = [['乾燥'], ['調子いい'], ['乾燥', 'くすみ'], ['調子いい'], ['テカリ'], ['ニキビ'], ['乾燥']];
   mins.forEach((m, i) => {
     const k = addDays(td, i - 7);
     d.days[k] = {
-      date: k, sample: true, taken: i % 3 === 2 ? ['s1'] : ['s1', 's2'],
+      date: k, sample: true, taken: i % 3 === 2 ? ['s1', 's2@朝'] : ['s1', 's2@朝', 's2@夜'],
       sleep: { bed: '23:30', wake: '07:00', min: m, q: qs[i], mood: '', tags: i === 5 ? ['スマホ', 'カフェイン'] : [] },
       skin: { chips: chipsets[i], advice: i === 6 ? { mode: 'normal', observation: '(サンプル)少し乾燥ぎみの日です。', today: { skincare: '保湿を重ねて、うるおいを守りましょう。', foodWater: 'こまめに水分を。', uv: '日焼け止めを忘れずに。', rest: '早めに休みましょう。' }, caution: '赤みが強い場合は皮膚科へ。', seeDoctor: false, source: 'local' } : null },
       memo: i === 4 ? '(サンプル)肌がしっとりした' : ''
