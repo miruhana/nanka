@@ -1,0 +1,14 @@
+{
+  "name": "なんか。",
+  "short_name": "なんか。",
+  "description": "服薬・睡眠・肌・頭痛をまとめて記録する、個人用の肌管理アプリ",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F1F4EF",
+  "theme_color": "#F1F4EF",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

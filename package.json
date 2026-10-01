@@ -1,0 +1,8 @@
+{
+  "name": "nanka",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "weather": "node scripts/update-weather.js"
+  }
+}

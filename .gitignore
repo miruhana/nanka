@@ -1,0 +1,6 @@
+# 手元の資料(公開しない)
+*.pdf
+nanka.html
+node_modules/
+.DS_Store
+Thumbs.db

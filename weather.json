@@ -1,0 +1,78 @@
+{
+  "updatedAt": "2026-10-01T13:16:49.102Z",
+  "regions": [
+    {
+      "name": "東京都荒川区南千住",
+      "today": {
+        "date": "2026-10-01",
+        "condition": "弱い霧雨",
+        "tempMax": 29,
+        "tempMin": 18,
+        "humidity": 83,
+        "rainChance": 55,
+        "pressure": 1010,
+        "pressureChangeHpa": -7.9
+      },
+      "tomorrow": {
+        "date": "2026-10-02",
+        "condition": "弱い霧雨",
+        "tempMax": 23,
+        "tempMin": 19,
+        "humidity": 74,
+        "rainChance": 94,
+        "pressure": 1013,
+        "pressureChangeHpa": -1
+      },
+      "tempDiffFromYesterday": 8
+    },
+    {
+      "name": "千葉県浦安市舞浜",
+      "today": {
+        "date": "2026-10-01",
+        "condition": "弱い霧雨",
+        "tempMax": 28,
+        "tempMin": 19,
+        "humidity": 85,
+        "rainChance": 65,
+        "pressure": 1009,
+        "pressureChangeHpa": -7.7
+      },
+      "tomorrow": {
+        "date": "2026-10-02",
+        "condition": "弱い霧雨",
+        "tempMax": 24,
+        "tempMin": 20,
+        "humidity": 75,
+        "rainChance": 75,
+        "pressure": 1013,
+        "pressureChangeHpa": -0.9
+      },
+      "tempDiffFromYesterday": 7
+    },
+    {
+      "name": "新潟県加茂市",
+      "today": {
+        "date": "2026-10-01",
+        "condition": "霧雨",
+        "tempMax": 26,
+        "tempMin": 16,
+        "humidity": 81,
+        "rainChance": 92,
+        "pressure": 1011,
+        "pressureChangeHpa": -2.5
+      },
+      "tomorrow": {
+        "date": "2026-10-02",
+        "condition": "くもり",
+        "tempMax": 23,
+        "tempMin": 15,
+        "humidity": 70,
+        "rainChance": 69,
+        "pressure": 1016,
+        "pressureChangeHpa": -1
+      },
+      "tempDiffFromYesterday": 0
+    }
+  ],
+  "source": "morning"
+}
