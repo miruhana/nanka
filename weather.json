@@ -1,77 +1,77 @@
 {
-  "updatedAt": "2026-11-03T02:39:40.684Z",
+  "updatedAt": "2026-11-04T00:55:42.798Z",
   "regions": [
     {
       "name": "東京都荒川区南千住",
       "today": {
-        "date": "2026-11-03",
-        "condition": "晴れ時々くもり",
-        "tempMax": 20,
+        "date": "2026-11-04",
+        "condition": "強い霧雨",
+        "tempMax": 15,
         "tempMin": 12,
-        "humidity": 68,
-        "rainChance": 12,
-        "pressure": 1020,
-        "pressureChangeHpa": -1.2
+        "humidity": 72,
+        "rainChance": 98,
+        "pressure": 1028,
+        "pressureChangeHpa": -3.4
       },
       "tomorrow": {
-        "date": "2026-11-04",
-        "condition": "弱い霧雨",
-        "tempMax": 19,
-        "tempMin": 12,
-        "humidity": 58,
-        "rainChance": 53,
-        "pressure": 1029,
-        "pressureChangeHpa": -2.7
+        "date": "2026-11-05",
+        "condition": "雨",
+        "tempMax": 17,
+        "tempMin": 11,
+        "humidity": 90,
+        "rainChance": 100,
+        "pressure": 1015,
+        "pressureChangeHpa": -19.6
       },
-      "tempDiffFromYesterday": 3
+      "tempDiffFromYesterday": -5
     },
     {
       "name": "千葉県浦安市舞浜",
       "today": {
-        "date": "2026-11-03",
-        "condition": "くもり",
-        "tempMax": 20,
-        "tempMin": 14,
-        "humidity": 65,
-        "rainChance": 2,
-        "pressure": 1020,
-        "pressureChangeHpa": -1.2
+        "date": "2026-11-04",
+        "condition": "強い霧雨",
+        "tempMax": 16,
+        "tempMin": 12,
+        "humidity": 71,
+        "rainChance": 96,
+        "pressure": 1028,
+        "pressureChangeHpa": -3.6
       },
       "tomorrow": {
-        "date": "2026-11-04",
-        "condition": "弱い霧雨",
-        "tempMax": 19,
-        "tempMin": 13,
-        "humidity": 58,
-        "rainChance": 47,
-        "pressure": 1029,
-        "pressureChangeHpa": -2.7
+        "date": "2026-11-05",
+        "condition": "雨",
+        "tempMax": 17,
+        "tempMin": 12,
+        "humidity": 90,
+        "rainChance": 100,
+        "pressure": 1015,
+        "pressureChangeHpa": -19.1
       },
-      "tempDiffFromYesterday": 2
+      "tempDiffFromYesterday": -3
     },
     {
       "name": "新潟県加茂市",
       "today": {
-        "date": "2026-11-03",
+        "date": "2026-11-04",
         "condition": "くもり",
-        "tempMax": 16,
+        "tempMax": 18,
         "tempMin": 9,
-        "humidity": 68,
-        "rainChance": 67,
-        "pressure": 1022,
-        "pressureChangeHpa": -0.8
+        "humidity": 60,
+        "rainChance": 35,
+        "pressure": 1028,
+        "pressureChangeHpa": -5.9
       },
       "tomorrow": {
-        "date": "2026-11-04",
-        "condition": "晴れ時々くもり",
-        "tempMax": 18,
-        "tempMin": 8,
-        "humidity": 61,
-        "rainChance": 6,
-        "pressure": 1028,
-        "pressureChangeHpa": -4.4
+        "date": "2026-11-05",
+        "condition": "雨",
+        "tempMax": 20,
+        "tempMin": 12,
+        "humidity": 86,
+        "rainChance": 100,
+        "pressure": 1014,
+        "pressureChangeHpa": -17.9
       },
-      "tempDiffFromYesterday": 1
+      "tempDiffFromYesterday": 2
     }
   ],
   "source": "morning"
