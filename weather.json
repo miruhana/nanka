@@ -1,77 +1,77 @@
 {
-  "updatedAt": "2026-11-12T02:01:14.525Z",
+  "updatedAt": "2026-11-13T01:29:17.617Z",
   "regions": [
     {
       "name": "東京都荒川区南千住",
       "today": {
-        "date": "2026-11-12",
-        "condition": "晴れ",
-        "tempMax": 18,
-        "tempMin": 9,
-        "humidity": 71,
-        "rainChance": 0,
-        "pressure": 1027,
-        "pressureChangeHpa": -3.2
-      },
-      "tomorrow": {
         "date": "2026-11-13",
         "condition": "快晴",
         "tempMax": 20,
         "tempMin": 9,
-        "humidity": 69,
+        "humidity": 75,
         "rainChance": 0,
         "pressure": 1023,
-        "pressureChangeHpa": -4
+        "pressureChangeHpa": -4.2
+      },
+      "tomorrow": {
+        "date": "2026-11-14",
+        "condition": "晴れ時々くもり",
+        "tempMax": 20,
+        "tempMin": 11,
+        "humidity": 67,
+        "rainChance": 0,
+        "pressure": 1020,
+        "pressureChangeHpa": -4.3
       },
       "tempDiffFromYesterday": 3
     },
     {
       "name": "千葉県浦安市舞浜",
       "today": {
-        "date": "2026-11-12",
-        "condition": "晴れ",
-        "tempMax": 17,
-        "tempMin": 10,
-        "humidity": 67,
-        "rainChance": 0,
-        "pressure": 1027,
-        "pressureChangeHpa": -3.1
-      },
-      "tomorrow": {
         "date": "2026-11-13",
         "condition": "晴れ",
-        "tempMax": 19,
+        "tempMax": 18,
         "tempMin": 11,
-        "humidity": 69,
+        "humidity": 75,
         "rainChance": 0,
         "pressure": 1023,
-        "pressureChangeHpa": -3.9
+        "pressureChangeHpa": -3.7
       },
-      "tempDiffFromYesterday": 2
+      "tomorrow": {
+        "date": "2026-11-14",
+        "condition": "晴れ時々くもり",
+        "tempMax": 19,
+        "tempMin": 12,
+        "humidity": 66,
+        "rainChance": 2,
+        "pressure": 1020,
+        "pressureChangeHpa": -4
+      },
+      "tempDiffFromYesterday": 1
     },
     {
       "name": "新潟県加茂市",
       "today": {
-        "date": "2026-11-12",
-        "condition": "くもり",
-        "tempMax": 18,
-        "tempMin": 6,
-        "humidity": 74,
-        "rainChance": 73,
-        "pressure": 1026,
+        "date": "2026-11-13",
+        "condition": "晴れ",
+        "tempMax": 20,
+        "tempMin": 11,
+        "humidity": 69,
+        "rainChance": 31,
+        "pressure": 1023,
         "pressureChangeHpa": -3
       },
       "tomorrow": {
-        "date": "2026-11-13",
-        "condition": "晴れ時々くもり",
+        "date": "2026-11-14",
+        "condition": "くもり",
         "tempMax": 20,
         "tempMin": 12,
-        "humidity": 71,
-        "rainChance": 65,
-        "pressure": 1023,
-        "pressureChangeHpa": -2.8
+        "humidity": 77,
+        "rainChance": 47,
+        "pressure": 1020,
+        "pressureChangeHpa": -4.5
       },
-      "tempDiffFromYesterday": 6
+      "tempDiffFromYesterday": 2
     }
   ],
   "source": "morning"
